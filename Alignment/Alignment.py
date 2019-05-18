@@ -24,13 +24,13 @@ class Tunnel:
 
 
 def test():
-    p1 = Point(1,2,3)
-    p2 = Point(4,5,6)
-    d = Point.Dist(p1,p2)
+    p1 = Point(1,1,1)
+    p2 = Point(1,1,2)
+    d = p1.CalcDist(p2)
 
-    assert d==5
+    assert d==1
 
-    print pass
+    print ("pass")
 
 
 if __name__ == "__main__":
