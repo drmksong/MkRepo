@@ -26,7 +26,7 @@ class WorkingPoints:
         for pnt in pnts:
             self.Points.append(pnt)
 
-    def add(self,pnt):
+    def append(self,pnt):
         self.Points.append(pnt)
 
     def size(self):
@@ -72,7 +72,7 @@ class Tunnel:
         pnt.Y = sp.Y + B * t
         pnt.Z = sp.Z + C * t
 
-        print (pnt.X, pnt.Y, pnt.Z, A, B, C, t)
+#        print (pnt.X, pnt.Y, pnt.Z, A, B, C, t)
         return pnt
 
 
@@ -82,11 +82,18 @@ class Tunnels:
         for tun in tuns:
             self.Tunnels.append(tun)
 
+    def size(self):
+        return len(self.Tunnels)
+
+    def append(self,tun):
+        self.Tunnels.append(tun)
+
 
 def test():
     p1 = Point(1,1,1)
     p2 = Point(1,1,2)
     p3 = Point(1,1,3)
+    p4 = Point(1,1,4)
 
     pnts = list()
     pnts.append(p1)
@@ -94,21 +101,28 @@ def test():
     pnts.append(p3)
     d = p1.calc_dist(p2)
     wp = WorkingPoints(pnts)
+    wp.append(p4)
     wp.print()
     t1 = Tunnel(wp)
     t2 = Tunnel(wp)
+
     t1.setWP(0,2)
     t2.setWP(2,1)
+
+    tuns = Tunnels([])
+    tuns.append(t1)
+    tuns.append(t2)
+
     d2 = t1.calc_dist()
     d3 = t2.calc_dist()
     pnt = t1.station(1)
 
-    assert wp.size() == 3
+    assert wp.size() == 4
     assert d == 1
     assert d2 == 2
     assert d3 == 1
     assert pnt.Z == 2
-
+    assert tuns.size() == 2
 
     print ("pass")
 
