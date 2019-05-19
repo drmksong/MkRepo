@@ -5,6 +5,20 @@ import string
 import re
 import kivy
 
+class Alignment:
+    def __init__(self):
+        self.FileName = ""
+        self.WorkingPoints = WorkingPoints([])
+        self.Tunnels = Tunnels([])
+
+# TODO: implement the loading function
+    def load(self,fname):
+        pass
+
+# TODO: implement the saving function
+    def save(self,fname):
+        pass
+
 
 class Point:
     def __init__(self, x,y,z):
