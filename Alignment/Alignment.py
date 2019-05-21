@@ -5,15 +5,19 @@ import string
 import re
 import kivy
 
+
 class Alignment:
     def __init__(self):
         self.FileName = ""
         self.WorkingPoints = WorkingPoints([])
         self.Tunnels = Tunnels([])
 
-# TODO: implement the loading function
     def load(self,fname):
-        pass
+        self.FileName = fname
+        with open(fname,'r') as f:
+            lines = f.readlines()
+        for line in lines:
+            print(line,end=' ')
 
 # TODO: implement the saving function
     def save(self,fname):
@@ -130,6 +134,9 @@ def test():
     d2 = t1.calc_dist()
     d3 = t2.calc_dist()
     pnt = t1.station(1)
+
+    align = Alignment()
+    align.load("1.txt")
 
     assert wp.size() == 4
     assert d == 1
