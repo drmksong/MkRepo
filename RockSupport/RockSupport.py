@@ -39,14 +39,6 @@ class RockSupport:
         pass
 
 
-class RMR:
-    def __init__(self):
-        pass
-
-
-class Qsys:
-    def __init__(self):
-        pass
 
 
 def test():
