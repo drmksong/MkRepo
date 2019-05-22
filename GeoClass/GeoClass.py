@@ -28,11 +28,9 @@ class RMR:
         self.rockClass = 0
 
     def classify(self):
-
-
-
-
+        pass
 
 
 class Qsys:
     def __init__(self):
+        pass

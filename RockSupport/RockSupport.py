@@ -34,17 +34,15 @@ class Shotcrete:
 
 class RockSupport:
     def __init__(self):
-        self.rockboltockbolt =
-        self.shotcretehotcrete =
+        self.rockbolt = Rockbolt()
+        self.shotcrete = Shotcrete()
         pass
-
-
 
 
 def test():
     pass
 
 
-
 if __name__ == "__main__":
     test()
+
