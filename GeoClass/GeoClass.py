@@ -37,13 +37,27 @@ class RMR:
         self.isClassified = False
 
     def classify(self):
+        self.rmrValue = 0;
         if self.rockStrengthType == RockStrengthType.rsNone:
             self.isClassified = False
-            return -1
+            return False
 
         if self.jointCondition == JointCondition.jcNone:
             self.isClassified = False
-            return -1
+            return False
+
+        if self.rockStrengthType == RockStrengthType.rsUCS:
+            if self.UCS >= 10:
+                self.rmrValue += 5
+            elif 5 <= self.UCS < 10:
+                self.rmrValue += 4
+            elif 1 <= self.UCS < 5:
+                self.rmrValue +=3
+
+
+
+
+
 
     def conv_to_q(self):
         if self.isClassified:
