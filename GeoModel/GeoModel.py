@@ -30,6 +30,9 @@ def test():
     # Writes the kriged grid to an ASCII grid file.
     kt.write_asc_grid(gridx, gridy, z, filename="output.asc")
 
+    for zv in z:
+        print (zv)
+
 
 if __name__ == "__main__":
     test()
