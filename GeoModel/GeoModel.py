@@ -4,9 +4,43 @@ from pykrige.ok import OrdinaryKriging
 import kivy
 import numpy as np
 
+class GeoModel:
+    def __init__(self):
+        self.FileName = ""
+        self.Data = np.array([[]])
+
+    def load(self, fname):
+        self.FileName = fname
+        self.Data = np.array([[0,0,0,0]])
+        with open(fname, 'r') as f:
+            lines = f.readlines()
+        for line in lines:
+            numbers = line.split()
+
+            #x,y,z,v = numbers
+            #print (numbers)
+            x = numbers[0]
+            y = numbers[1]
+            z = numbers[2]
+            v = numbers[3]
+            #print(x,y,z,v)
+            self.Data = np.append(self.Data,[[x,y,z,v]],axis = 0)
+
+        self.Data = np.delete(self.Data,0,axis=0)
+        print(self.Data)
 
 def test():
+    data = np.array([[0,0,0,0]])
+    data = np.append(data,[[1,2,3,4]],axis = 0)
+    data = np.append(data,[[2,3,4,5]],axis = 0)
+    data = np.delete(data,0,axis=0)
+    print (data)
+    gm = GeoModel()
+    gm.load("hslpg.txt")
 
+
+
+'''
     data = np.array([[0.3, 1.2, 0.47],
                      [1.9, 0.6, 0.56],
                      [1.1, 3.2, 0.74],
@@ -32,7 +66,7 @@ def test():
 
     for zv in z:
         print (zv)
-
+'''
 
 if __name__ == "__main__":
     test()
