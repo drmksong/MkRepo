@@ -16,8 +16,21 @@ class Alignment:
         self.FileName = fname
         with open(fname,'r') as f:
             lines = f.readlines()
-        for line in lines:
-            print(line,end=' ')
+
+        line = lines[0]
+        cnt = 1
+        cols = line.split(' ')
+        np = int(cols[0])
+
+        for i in range(np):
+            line = lines[cnt]
+            cols = line.split(' ')
+            x,y,z = int(cols[0]), int(cols[1]), int(cols[2])
+            tun = Tunnels([x,y,z])
+            self.Tunnels.append(tun)
+
+
+
 
 # TODO: implement the saving function
     def save(self,fname):
