@@ -21,18 +21,36 @@ class Alignment:
         cnt = 1
         cols = line.split(' ')
         np = int(cols[0])
+        pnts = []
 
         for i in range(np):
             line = lines[cnt]
             cols = line.split(' ')
-            x,y,z = int(cols[0]), int(cols[1]), int(cols[2])
-            tun = Tunnels([x,y,z])
+            x,y,z = float(cols[0]), float(cols[1]), float(cols[2])
+            wp = Point(x,y,z)
+            pnts.append(wp)
+            cnt += 1
+
+        self.WorkingPoints = WorkingPoints(pnts)
+        self.WorkingPoints.print()
+
+        line = lines[cnt]
+        cols = line.split(' ')
+        nt = int(cols[0])
+        cnt += 1
+
+        for i in range(nt):
+            line = lines[cnt]
+            cols = line.split(' ')
+            s, e = float(cols[0]), float(cols[1])
+            tun = Tunnel(self.WorkingPoints)
+            tun.StartPoint = s
+            tun.EndPoint = e
             self.Tunnels.append(tun)
+            cnt += 1
 
 
-
-
-# TODO: implement the saving function
+    # TODO: implement the saving function
     def save(self,fname):
         pass
 
@@ -157,6 +175,9 @@ def test():
     assert d3 == 1
     assert pnt.Z == 2
     assert tuns.size() == 2
+    print (align.WorkingPoints.size())
+    assert align.WorkingPoints.size() == 8
+    assert align.Tunnels.size() == 12
 
     print ("pass")
 
