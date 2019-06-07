@@ -11,6 +11,7 @@ class Alignment:
         self.FileName = ""
         self.WorkingPoints = WorkingPoints([])
         self.Tunnels = Tunnels([])
+        self.Portals = []
 
     def load(self,fname):
         self.FileName = fname
@@ -42,12 +43,25 @@ class Alignment:
         for i in range(nt):
             line = lines[cnt]
             cols = line.split(' ')
-            s, e = float(cols[0]), float(cols[1])
+            s, e = int(cols[0]), int(cols[1])
             tun = Tunnel(self.WorkingPoints)
             tun.StartPoint = s
             tun.EndPoint = e
             self.Tunnels.append(tun)
             cnt += 1
+
+        line = lines[cnt]
+        cols = line.split(' ')
+        np = int(cols[0])
+        cnt += 1
+
+        for i in range(np):
+            line = lines[cnt]
+            cols = line.split(' ')
+            p = int(cols[0])
+            self.Portals.append(p)
+            cnt += 1
+
 
 
     # TODO: implement the saving function
@@ -178,6 +192,7 @@ def test():
     print (align.WorkingPoints.size())
     assert align.WorkingPoints.size() == 8
     assert align.Tunnels.size() == 12
+    assert len(align.Portals) == 1
 
     print ("pass")
 
