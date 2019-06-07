@@ -138,6 +138,16 @@ class Tunnel:
 #        print (pnt.X, pnt.Y, pnt.Z, A, B, C, t)
         return pnt
 
+    def march(self):
+        stations = []
+        length = self.dist()
+
+        for i in range(int(length)):
+            stations.append(self.station(i))
+
+        return stations
+
+
 
 class Tunnels:
     def __init__(self,tuns):
