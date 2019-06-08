@@ -3,13 +3,16 @@ import sys
 import os
 import string
 import re
-import kivy
+#import kivy
+from colorama import Fore
+from colorama import Style
+
 
 
 class Alignment:
     def __init__(self):
         self.FileName = ""
-        self.WorkingPoints = WorkingPoints([])
+        self.WorkingPoints = WorkingPoints()
         self.Tunnels = Tunnels([])
         self.Portals = []
 
@@ -19,6 +22,7 @@ class Alignment:
             lines = f.readlines()
 
         line = lines[0]
+        print (line)
         cnt = 1
         cols = line.split(' ')
         np = int(cols[0])
@@ -27,12 +31,13 @@ class Alignment:
         for i in range(np):
             line = lines[cnt]
             cols = line.split(' ')
-            x,y,z = float(cols[0]), float(cols[1]), float(cols[2])
+            print(f'x,y,z {Fore.GREEN} ' , (cols[0]), (cols[1]), (cols[2]), f'{Style.RESET_ALL}')
+            x, y, z = float(cols[0]), float(cols[1]), float(cols[2])
             wp = Point(x,y,z)
             pnts.append(wp)
             cnt += 1
 
-        self.WorkingPoints = WorkingPoints(pnts)
+        self.WorkingPoints.setpoints(pnts)
         self.WorkingPoints.print()
 
         line = lines[cnt]
@@ -83,9 +88,30 @@ class Point:
         print("pnt: X ",self.X,", Y ",self.Y,", Z ",self.Z)
 
 
-class WorkingPoints:
-    def __init__(self,pnts):
+class Points:
+    def __init__(self,pnts:[Point]):
         self.Points = []
+        for pnt in pnts:
+            self.Points.append(pnt)
+
+    def size(self):
+        return len(self.Points)
+
+    def append(self,tun):
+        self.Points.append(tun)
+
+    def __getitem__(self, item):
+        return self.Points[item]
+
+    def __setitem__(self, key, value):
+        self.Points[key] = value
+
+
+class WorkingPoints:
+    def __init__(self):
+        self.Points = []
+
+    def setpoints(self,pnts):
         for pnt in pnts:
             self.Points.append(pnt)
 
@@ -97,7 +123,7 @@ class WorkingPoints:
 
     def print(self):
         for pnt in self.Points:
-            pnt.print()
+            print('WprkingPoint::print : ',pnt.X, pnt.Y, pnt.Z)
 
 
 class Tunnel:
@@ -134,23 +160,27 @@ class Tunnel:
         pnt.X = sp.X + A * t
         pnt.Y = sp.Y + B * t
         pnt.Z = sp.Z + C * t
-
 #        print (pnt.X, pnt.Y, pnt.Z, A, B, C, t)
         return pnt
 
     def march(self):
         stations = []
-        length = self.dist()
+        length = self.calc_dist()
 
         for i in range(int(length)):
             stations.append(self.station(i))
 
+        for st in stations:
+            print(st.X, st.Y, st.Z)
+
         return stations
 
+    def print(self):
+        print ('Tunnel::print ',self.StartPoint,self.EndPoint)
 
 
 class Tunnels:
-    def __init__(self,tuns):
+    def __init__(self,tuns:[Tunnel]):
         self.Tunnels = []
         for tun in tuns:
             self.Tunnels.append(tun)
@@ -161,6 +191,12 @@ class Tunnels:
     def append(self,tun):
         self.Tunnels.append(tun)
 
+    def __getitem__(self, item):
+        return self.Tunnels[item]
+
+    def __setitem__(self, key, value):
+        self.Tunnels[key] = value
+
 
 def test():
     p1 = Point(1,1,1)
@@ -168,12 +204,13 @@ def test():
     p3 = Point(1,1,3)
     p4 = Point(1,1,4)
 
-    pnts = list()
+    pnts = []
     pnts.append(p1)
     pnts.append(p2)
     pnts.append(p3)
     d = p1.calc_dist(p2)
-    wp = WorkingPoints(pnts)
+    wp = WorkingPoints()
+    wp.setpoints(pnts)
     wp.append(p4)
     wp.print()
     t1 = Tunnel(wp)
@@ -186,6 +223,8 @@ def test():
     tuns.append(t1)
     tuns.append(t2)
 
+    tuns[0].print()
+
     d2 = t1.calc_dist()
     d3 = t2.calc_dist()
     pnt = t1.station(1)
@@ -197,12 +236,18 @@ def test():
     assert d == 1
     assert d2 == 2
     assert d3 == 1
+    print (pnt.X, pnt.Y, pnt.Z)
     assert pnt.Z == 2
     assert tuns.size() == 2
     print (align.WorkingPoints.size())
     assert align.WorkingPoints.size() == 8
     assert align.Tunnels.size() == 12
     assert len(align.Portals) == 1
+
+    sts = align.Tunnels.Tunnels[0].march()
+    for st in sts:
+        print(st.X, st.Y, st.Z)
+
 
     print ("pass")
 
