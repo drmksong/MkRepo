@@ -8,11 +8,10 @@ from colorama import Fore
 from colorama import Style
 
 
-
 class Alignment:
     def __init__(self):
         self.FileName = ""
-        self.WorkingPoints = WorkingPoints()
+        self.WorkingPoints = WorkingPoints([])
         self.Tunnels = Tunnels([])
         self.Portals = []
 
@@ -26,7 +25,7 @@ class Alignment:
         cnt = 1
         cols = line.split(' ')
         np = int(cols[0])
-        pnts = []
+        pnts = Points([])
 
         for i in range(np):
             line = lines[cnt]
@@ -38,6 +37,7 @@ class Alignment:
             cnt += 1
 
         self.WorkingPoints.setpoints(pnts)
+        self.WorkingPoints.size()
         self.WorkingPoints.print()
 
         line = lines[cnt]
@@ -67,10 +67,8 @@ class Alignment:
             self.Portals.append(p)
             cnt += 1
 
-
-
     # TODO: implement the saving function
-    def save(self,fname):
+    def save(self, fname):
         pass
 
 
@@ -89,7 +87,7 @@ class Point:
 
 
 class Points:
-    def __init__(self,pnts:[Point]):
+    def __init__(self, pnts:[Point]):
         self.Points = []
         for pnt in pnts:
             self.Points.append(pnt)
@@ -97,8 +95,12 @@ class Points:
     def size(self):
         return len(self.Points)
 
-    def append(self,tun):
-        self.Points.append(tun)
+    def append(self, pnt):
+        self.Points.append(pnt)
+
+    def print(self):
+        for pnt in self.Points:
+            print(pnt.X, pnt.Y, pnt.Z)
 
     def __getitem__(self, item):
         return self.Points[item]
@@ -108,22 +110,26 @@ class Points:
 
 
 class WorkingPoints:
-    def __init__(self):
-        self.Points = []
+    def __init__(self, pnts:Points):
+        self.Points = pnts
 
-    def setpoints(self,pnts):
-        for pnt in pnts:
-            self.Points.append(pnt)
+    def setpoints(self, pnts): # pnts is Points class
+        self.Points = pnts
 
-    def append(self,pnt):
+    def append(self, pnt):
         self.Points.append(pnt)
 
     def size(self):
-        return len(self.Points)
+        return self.Points.size()
 
     def print(self):
-        for pnt in self.Points:
-            print('WprkingPoint::print : ',pnt.X, pnt.Y, pnt.Z)
+        self.Points.print()
+
+    def __getitem__(self, item):
+        return self.Points[item]
+
+    def __setitem__(self, key, value):
+        self.Points[key] = value
 
 
 class Tunnel:
@@ -139,12 +145,12 @@ class Tunnel:
     def calc_dist(self):
         if self.StartPoint==-1 or self.EndPoint == -1:
             return 0
-        return self.WorkingPoints.Points[self.StartPoint].calc_dist(self.WorkingPoints.Points[self.EndPoint])
+        return self.WorkingPoints[self.StartPoint].calc_dist(self.WorkingPoints[self.EndPoint])
 
     def station(self, dis):
 
-        sp = self.WorkingPoints.Points[self.StartPoint]
-        ep = self.WorkingPoints.Points[self.EndPoint]
+        sp = self.WorkingPoints[self.StartPoint]
+        ep = self.WorkingPoints[self.EndPoint]
         A = ep.X - sp.X
         B = ep.Y - sp.Y
         C = ep.Z - sp.Z
@@ -199,20 +205,28 @@ class Tunnels:
 
 
 def test():
-    p1 = Point(1,1,1)
+    ps = []
+
+    p1 = Point(1.0,1,1)
     p2 = Point(1,1,2)
     p3 = Point(1,1,3)
     p4 = Point(1,1,4)
 
-    pnts = []
+    pnts = Points(ps)
     pnts.append(p1)
     pnts.append(p2)
     pnts.append(p3)
     d = p1.calc_dist(p2)
-    wp = WorkingPoints()
+    print(d)
+    pnts.print()
+
+    wp = WorkingPoints(pnts)
     wp.setpoints(pnts)
     wp.append(p4)
     wp.print()
+    wp[0].print()
+
+
     t1 = Tunnel(wp)
     t2 = Tunnel(wp)
 
@@ -225,9 +239,11 @@ def test():
 
     tuns[0].print()
 
+
     d2 = t1.calc_dist()
     d3 = t2.calc_dist()
     pnt = t1.station(1)
+
 
     align = Alignment()
     align.load("1.txt")
@@ -244,12 +260,13 @@ def test():
     assert align.Tunnels.size() == 12
     assert len(align.Portals) == 1
 
-    sts = align.Tunnels.Tunnels[0].march()
+    sts = align.Tunnels[0].march()
     for st in sts:
         print(st.X, st.Y, st.Z)
 
 
     print ("pass")
+
 
 
 if __name__ == "__main__":
