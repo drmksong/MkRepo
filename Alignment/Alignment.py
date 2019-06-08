@@ -131,14 +131,35 @@ class WorkingPoints:
     def __setitem__(self, key, value):
         self.Points[key] = value
 
+class ExcavFace:
+    def __init__(self):
+        self.Location = 0 #
+        self.Direction = 0 # 0 : start to end, 1 : end to start
+        self.Advance = 0 # advance per blast round
+        self.Date = 0
+        self.Tunnel = Tunnel()
+        self.Excavated = False
+
+    def set(self, loc, dir, adv, date, tun):
+        self.Location = loc
+        self.Direction = dir
+        self.Advance = adv
+        self.Date = date
+        self.Tunnel = tun
+
+    def excav(self):
+        self.Excavated = True
+
 
 class Tunnel:
     def __init__(self,wp): # sp and ep are not points but index to the points
         self.WorkingPoints = wp
         self.StartPoint = -1
         self.EndPoint = -1
+        self.ExcaFaces = []
+        self.Completed = False
 
-    def setWP(self,sp,ep):
+    def setwp(self,sp,ep):
         self.StartPoint = sp
         self.EndPoint = ep
 
@@ -147,8 +168,10 @@ class Tunnel:
             return 0
         return self.WorkingPoints[self.StartPoint].calc_dist(self.WorkingPoints[self.EndPoint])
 
-    def station(self, dis):
+    def excav(self):
+        pass
 
+    def station(self, dis):
         sp = self.WorkingPoints[self.StartPoint]
         ep = self.WorkingPoints[self.EndPoint]
         A = ep.X - sp.X
@@ -169,7 +192,7 @@ class Tunnel:
 #        print (pnt.X, pnt.Y, pnt.Z, A, B, C, t)
         return pnt
 
-    def march(self):
+    def trace(self):
         stations = []
         length = self.calc_dist()
 
@@ -188,6 +211,7 @@ class Tunnel:
 class Tunnels:
     def __init__(self,tuns:[Tunnel]):
         self.Tunnels = []
+        self.Completed = False
         for tun in tuns:
             self.Tunnels.append(tun)
 
@@ -196,6 +220,13 @@ class Tunnels:
 
     def append(self,tun):
         self.Tunnels.append(tun)
+
+    def iscompleted(self):
+        completed = True
+        for tun in self.Tunnels:
+            completed = completed and tun.Completed
+        self.Completed = completed
+        return self.Completed
 
     def __getitem__(self, item):
         return self.Tunnels[item]
@@ -230,8 +261,8 @@ def test():
     t1 = Tunnel(wp)
     t2 = Tunnel(wp)
 
-    t1.setWP(0,2)
-    t2.setWP(2,1)
+    t1.setwp(0,2)
+    t2.setwp(2,1)
 
     tuns = Tunnels([])
     tuns.append(t1)
@@ -260,7 +291,7 @@ def test():
     assert align.Tunnels.size() == 12
     assert len(align.Portals) == 1
 
-    sts = align.Tunnels[0].march()
+    sts = align.Tunnels[0].trace()
     for st in sts:
         print(st.X, st.Y, st.Z)
 
