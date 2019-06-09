@@ -4,6 +4,8 @@ import os
 import string
 import re
 #import kivy
+import enum
+import copy
 from colorama import Fore
 from colorama import Style
 
@@ -87,7 +89,7 @@ class Point:
 
 
 class Points:
-    def __init__(self, pnts:[Point]):
+    def __init__(self, pnts: [Point]):
         self.Points = []
         for pnt in pnts:
             self.Points.append(pnt)
@@ -110,7 +112,7 @@ class Points:
 
 
 class WorkingPoints:
-    def __init__(self, pnts:Points):
+    def __init__(self, pnts: Points):
         self.Points = pnts
 
     def setpoints(self, pnts): # pnts is Points class
@@ -131,24 +133,61 @@ class WorkingPoints:
     def __setitem__(self, key, value):
         self.Points[key] = value
 
+
+class ExcavDir(enum.Enum):
+    edNone = -1
+    edForward = 0
+    edBackward = 1
+
+
 class ExcavFace:
     def __init__(self):
         self.Location = 0 #
-        self.Direction = 0 # 0 : start to end, 1 : end to start
+        self.Direction = ExcavDir.edNone
         self.Advance = 0 # advance per blast round
         self.Date = 0
-        self.Tunnel = Tunnel()
+        self.Tunnel = Tunnel([])
         self.Excavated = False
+        self.Current = False
 
-    def set(self, loc, dir, adv, date, tun):
+    def set(self, loc, dir: ExcavDir, adv, date, tun):
         self.Location = loc
         self.Direction = dir
         self.Advance = adv
         self.Date = date
         self.Tunnel = tun
 
+    def setcurrent(self):
+        self.Current = True
+
     def excav(self):
         self.Excavated = True
+        self.Current = False
+
+
+
+
+class ExcavFaces:
+    def __init__(self,faces: [ExcavFace]):
+        self.Faces = []
+        for face in faces:
+            self.Faces.append(face)
+
+    def size(self):
+        return len(self.Faces)
+
+    def append(self, pnt):
+        self.Faces.append(pnt)
+
+    def print(self):
+        for pnt in self.Faces:
+            print(pnt.X, pnt.Y, pnt.Z)
+
+    def __getitem__(self, item):
+        return self.Faces[item]
+
+    def __setitem__(self, key, value):
+        self.Faces[key] = value
 
 
 class Tunnel:
@@ -156,7 +195,7 @@ class Tunnel:
         self.WorkingPoints = wp
         self.StartPoint = -1
         self.EndPoint = -1
-        self.ExcaFaces = []
+        self.ExcavFaces = ExcavFaces([])
         self.Completed = False
 
     def setwp(self,sp,ep):
@@ -167,9 +206,6 @@ class Tunnel:
         if self.StartPoint==-1 or self.EndPoint == -1:
             return 0
         return self.WorkingPoints[self.StartPoint].calc_dist(self.WorkingPoints[self.EndPoint])
-
-    def excav(self):
-        pass
 
     def station(self, dis):
         sp = self.WorkingPoints[self.StartPoint]
@@ -203,6 +239,25 @@ class Tunnel:
             print(st.X, st.Y, st.Z)
 
         return stations
+
+    def excav(self):
+        faces = copy.copy(self.ExcavFaces.Faces)
+        for face in faces:
+            if face.Current is True:
+                nf = ExcavFace()
+                loc = face.Location + face.Direction*face.Advance
+                dir = face.Direction
+                adv = face.Advance
+                date = face.Date
+                tun = face.Tunnel
+                nf.set(loc,dir,adv,date,tun)
+                nf.Current = True
+
+                self.ExcavFaces.append(nf)
+                face.Current = False
+
+            else:
+                pass
 
     def print(self):
         print ('Tunnel::print ',self.StartPoint,self.EndPoint)
@@ -257,12 +312,13 @@ def test():
     wp.print()
     wp[0].print()
 
-
     t1 = Tunnel(wp)
     t2 = Tunnel(wp)
 
     t1.setwp(0,2)
     t2.setwp(2,1)
+
+    t1.excav()
 
     tuns = Tunnels([])
     tuns.append(t1)
