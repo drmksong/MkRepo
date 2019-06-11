@@ -4,6 +4,8 @@ import os
 import string
 import re
 #import kivy
+import time
+from datetime import date as dt
 import enum
 import copy
 from colorama import Fore
@@ -145,7 +147,7 @@ class ExcavFace:
         self.Location = 0 #
         self.Direction = ExcavDir.edNone
         self.Advance = 0 # advance per blast round
-        self.Date = 0
+        self.Date = dt(1,1,1)
         self.Tunnel = Tunnel([])
         self.Excavated = False
         self.Current = False
@@ -163,8 +165,6 @@ class ExcavFace:
     def excav(self):
         self.Excavated = True
         self.Current = False
-
-
 
 
 class ExcavFaces:
@@ -248,7 +248,7 @@ class Tunnel:
                 loc = face.Location + face.Direction*face.Advance
                 dir = face.Direction
                 adv = face.Advance
-                date = face.Date
+                date = dt.today()
                 tun = face.Tunnel
                 nf.set(loc,dir,adv,date,tun)
                 nf.Current = True
@@ -318,6 +318,9 @@ def test():
     t1.setwp(0,2)
     t2.setwp(2,1)
 
+    exf = ExcavFace()
+    exf.set(1,ExcavDir.edForward,2,dt.today(),t1)
+
     t1.excav()
 
     tuns = Tunnels([])
@@ -326,11 +329,9 @@ def test():
 
     tuns[0].print()
 
-
     d2 = t1.calc_dist()
     d3 = t2.calc_dist()
     pnt = t1.station(1)
-
 
     align = Alignment()
     align.load("1.txt")
@@ -350,7 +351,6 @@ def test():
     sts = align.Tunnels[0].trace()
     for st in sts:
         print(st.X, st.Y, st.Z)
-
 
     print ("pass")
 
