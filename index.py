@@ -1,5 +1,9 @@
-import Alignment 
+from Alignment import Alignment
+from Alignment import *
 
-test = "welcome"
-print(test)
+msg = "welcome"
+print(msg)
+aa = Alignment.Alignment()
+aa.load("Alignment/1.txt")
+
 Alignment.test()

@@ -334,7 +334,7 @@ def test():
     pnt = t1.station(1)
 
     align = Alignment()
-    align.load("1.txt")
+    align.load("Alignment/1.txt")
 
     assert wp.size() == 4
     assert d == 1
