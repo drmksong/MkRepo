@@ -195,7 +195,9 @@ class Tunnel:
         self.WorkingPoints = wp
         self.StartPoint = -1
         self.EndPoint = -1
-        self.ExcavFaces = ExcavFaces([])
+        self.StartExcavFace = ExcavFace()
+        self.EndExcavFace = ExcavFace()
+        self.ExcavFaces = ExcavFaces([self.StartPoint,self.EndExcavFace])
         self.Completed = False
 
     def setwp(self,sp,ep):
