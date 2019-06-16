@@ -7,6 +7,27 @@ import kivy
 import enum
 
 
+class GeoClassType(enum.Enum):
+    gcNone = -1
+    gcRMR = 0
+    gcQ = 1
+
+
+class GeoClass:
+    def __init__(self,gc):
+        self.GeoClassType = gc
+        self.RMR = RMR()
+        self.Qsys = Qsys()
+
+    def getclass(self):
+        if self.GeoClassType == GeoClassType.gcQ:
+            return self.Qsys.getclass()
+        elif self.GeoClassType == GeoClassType.gcRMR:
+            return self.RMR.getclass()
+        else:
+            return None
+
+
 class JointCondition(enum.Enum):
     jcVeryGood = 5
     jcGood = 4
@@ -33,8 +54,12 @@ class RMR:
         self.waterCondition = 0
         self.jointOrientation = 0
         self.rmrValue = -1
+        self.geoclass = -1
         self.qValue = -1
         self.isClassified = False
+
+    def getclass(self):
+        return self.classify()
 
     def classify(self):
         self.rmrValue = 0;
@@ -54,7 +79,20 @@ class RMR:
             elif 1 <= self.UCS < 5:
                 self.rmrValue +=3
 
+        if 0 <= self.rmrValue < 20:
+            self.geoclass = 5
+        elif 20 <= self.rmrValue < 40:
+            self.geoclass = 4
+        elif 40 <= self.rmrValue < 60:
+            self.geoclass = 3
+        elif 60 <= self.rmrValue < 80:
+            self.geoclass = 2
+        elif 80 <= self.rmrValue <= 100:
+            self.geoclass = 1
+        else:
+            self.geoclass = -1
 
+        return self.geoclass
 
 
 
