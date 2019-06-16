@@ -1,5 +1,4 @@
 from Alignment import Alignment
-from Alignment import *
 
 msg = "welcome"
 print(msg)
