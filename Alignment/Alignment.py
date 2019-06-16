@@ -5,6 +5,8 @@ import string
 import re
 #import kivy
 import time
+from GeoClass.GeoClass import GeoClass
+from GeoClass.GeoClass import GeoClassType
 from datetime import date as dt
 import enum
 import copy
@@ -34,7 +36,7 @@ class Alignment:
         for i in range(np):
             line = lines[cnt]
             cols = line.split(' ')
-            print(f'x,y,z {Fore.GREEN} ' , (cols[0]), (cols[1]), (cols[2]), f'{Style.RESET_ALL}')
+            print(f'x,y,z {Fore.GREEN} ', (cols[0]), (cols[1]), (cols[2]), f'{Style.RESET_ALL}')
             x, y, z = float(cols[0]), float(cols[1]), float(cols[2])
             wp = Point(x,y,z)
             pnts.append(wp)
@@ -148,16 +150,15 @@ class ExcavFace:
         self.Direction = ExcavDir.edNone
         self.Advance = 0 # advance per blast round
         self.Date = dt(1,1,1)
-        self.Tunnel = Tunnel([])
         self.Excavated = False
         self.Current = False
+        self.RockClass = GeoClass(gc=GeoClassType.gcNone)
 
     def set(self, loc, dir: ExcavDir, adv, date, tun):
         self.Location = loc
         self.Direction = dir
         self.Advance = adv
         self.Date = date
-        self.Tunnel = tun
 
     def setcurrent(self):
         self.Current = True
@@ -170,14 +171,18 @@ class ExcavFace:
 class ExcavFaces:
     def __init__(self,faces: [ExcavFace]):
         self.Faces = []
+        self.Current = ExcavFace()
         for face in faces:
             self.Faces.append(face)
 
     def size(self):
         return len(self.Faces)
 
-    def append(self, pnt):
-        self.Faces.append(pnt)
+    def append(self, face):
+        self.Faces.append(face)
+
+    def remove(self, face):
+        self.Faces.remove(face)
 
     def print(self):
         for pnt in self.Faces:
@@ -355,6 +360,8 @@ def test():
         print(st.X, st.Y, st.Z)
 
     print ("pass")
+
+
 
 
 
