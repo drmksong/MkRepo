@@ -34,7 +34,7 @@ class Alignment:
         for i in range(np):
             line = lines[cnt]
             cols = line.split(' ')
-            print(f'x,y,z {Fore.GREEN} ' , (cols[0]), (cols[1]), (cols[2]), f'{Style.RESET_ALL}')
+            print(f'x,y,z {Fore.GREEN} ', (cols[0]), (cols[1]), (cols[2]), f'{Style.RESET_ALL}')
             x, y, z = float(cols[0]), float(cols[1]), float(cols[2])
             wp = Point(x,y,z)
             pnts.append(wp)
