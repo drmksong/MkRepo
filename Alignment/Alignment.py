@@ -146,7 +146,7 @@ class ExcavDir(enum.Enum):
 
 class ExcavFace:
     def __init__(self):
-        self.Location = 0 #
+        self.Location = 0 # in terms of station from start to end
         self.Direction = ExcavDir.edNone
         self.Advance = 0 # advance per blast round
         self.Date = dt(1,1,1)
@@ -171,7 +171,8 @@ class ExcavFace:
 class ExcavFaces:
     def __init__(self,faces: [ExcavFace]):
         self.Faces = []
-        self.Current = ExcavFace()
+        self.Excavated = []
+
         for face in faces:
             self.Faces.append(face)
 
@@ -180,13 +181,19 @@ class ExcavFaces:
 
     def append(self, face):
         self.Faces.append(face)
+        start = face.Location
+        end = face.Location + face.Advance * (1 if face.Direction == ExcavDir.edForward else -1)
+        self.Excavated.append([start, end])
 
     def remove(self, face):
         self.Faces.remove(face)
+        start = face.Location
+        end = face.Location + face.Advance * (1 if face.Direction == ExcavDir.edForward else -1)
+        self.Excavated.remove([start, end])
 
     def print(self):
-        for pnt in self.Faces:
-            print(pnt.X, pnt.Y, pnt.Z)
+        for face in self.Faces:
+            print(face.Location, face.Direction, face.Advance)
 
     def __getitem__(self, item):
         return self.Faces[item]
@@ -202,7 +209,7 @@ class Tunnel:
         self.EndPoint = -1
         self.StartExcavFace = ExcavFace()
         self.EndExcavFace = ExcavFace()
-        self.ExcavFaces = ExcavFaces([self.StartPoint,self.EndExcavFace])
+        self.ExcavFaces = ExcavFaces([])
         self.Completed = False
 
     def setwp(self,sp,ep):
@@ -326,7 +333,14 @@ def test():
     t2.setwp(2,1)
 
     exf = ExcavFace()
-    exf.set(1,ExcavDir.edForward,2,dt.today(),t1)
+    exf.set(0,ExcavDir.edForward,2,dt.today())
+    exf2 = ExcavFace()
+    exf2.set(2,ExcavDir.edForward,4,dt.today())
+
+    efs = ExcavFaces([])
+    efs.append(exf)
+    efs.append(exf2)
+    efs.print()
 
     t1.excav()
 
