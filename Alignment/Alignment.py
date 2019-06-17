@@ -154,7 +154,7 @@ class ExcavFace:
         self.Current = False
         self.RockClass = GeoClass(gc=GeoClassType.gcNone)
 
-    def set(self, loc, dir: ExcavDir, adv, date, tun):
+    def set(self, loc, dir: ExcavDir, adv, date):
         self.Location = loc
         self.Direction = dir
         self.Advance = adv
