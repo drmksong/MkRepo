@@ -186,14 +186,21 @@ class ExcavFaces:
     def append(self, face):
         self.Faces.append(face)
         self.Excavated.append(face.Round)
+        self.condense()
 
     def remove(self, face):
         self.Faces.remove(face)
         self.Excavated.remove(face.Round)
 
+    def condense(self):
+        for ex in self.Excavated:
+            print(ex[0],ex[1])
+
+
     def print(self):
         for face in self.Faces:
             print(face.Location, face.Direction, face.Advance, face.Round)
+        print(self.Excavated)
 
     def __getitem__(self, item):
         return self.Faces[item]
