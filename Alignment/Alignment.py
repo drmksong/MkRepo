@@ -153,12 +153,16 @@ class ExcavFace:
         self.Excavated = False
         self.Current = False
         self.RockClass = GeoClass(gc=GeoClassType.gcNone)
+        self.Round = []
 
     def set(self, loc, dir: ExcavDir, adv, date):
         self.Location = loc
         self.Direction = dir
         self.Advance = adv
         self.Date = date
+        start = loc
+        end = loc + adv*(1 if dir == ExcavDir.edForward else -1)
+        self.Round = [start, end]
 
     def setcurrent(self):
         self.Current = True
@@ -181,19 +185,15 @@ class ExcavFaces:
 
     def append(self, face):
         self.Faces.append(face)
-        start = face.Location
-        end = face.Location + face.Advance * (1 if face.Direction == ExcavDir.edForward else -1)
-        self.Excavated.append([start, end])
+        self.Excavated.append(face.Round)
 
     def remove(self, face):
         self.Faces.remove(face)
-        start = face.Location
-        end = face.Location + face.Advance * (1 if face.Direction == ExcavDir.edForward else -1)
-        self.Excavated.remove([start, end])
+        self.Excavated.remove(face.Round)
 
     def print(self):
         for face in self.Faces:
-            print(face.Location, face.Direction, face.Advance)
+            print(face.Location, face.Direction, face.Advance, face.Round)
 
     def __getitem__(self, item):
         return self.Faces[item]
