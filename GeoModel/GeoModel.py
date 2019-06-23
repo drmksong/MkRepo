@@ -4,6 +4,7 @@ from pykrige.ok import OrdinaryKriging
 import kivy
 import numpy as np
 
+
 class GeoModel:
     def __init__(self):
         self.FileName = ""
@@ -28,6 +29,25 @@ class GeoModel:
 
         self.Data = np.delete(self.Data,0,axis=0)
         print(self.Data)
+
+    def getvalue(self,x,y,z):
+        return 100
+
+    def getclass(self,x,y,z):
+        cl = -1
+        value = self.getvalue(x,y,z)
+        if value < 20:
+            cl = 5
+        elif 20 <= value < 40:
+            cl = 4
+        elif 40 <= value < 60:
+            cl = 3
+        elif 60 <= value < 80:
+            cl = 2
+        elif 80 <= value <= 100:
+            cl = 1
+        return cl
+
 
 def test():
     data = np.array([[0,0,0,0]])

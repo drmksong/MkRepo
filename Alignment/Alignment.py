@@ -7,6 +7,7 @@ import re
 import time
 from GeoClass.GeoClass import GeoClass
 from GeoClass.GeoClass import GeoClassType
+from GeoModel.GeoModel import GeoModel
 from datetime import date as dt
 import enum
 import copy
@@ -147,6 +148,9 @@ class ExcavDir(enum.Enum):
 class ExcavFace:
     def __init__(self):
         self.Location = 0 # in terms of station from start to end
+        self.x = -1
+        self.y = -1
+        self.z = -1
         self.Direction = ExcavDir.edNone
         self.Advance = 0 # advance per blast round
         self.Date = dt(1,1,1)
@@ -164,12 +168,20 @@ class ExcavFace:
         end = loc + adv*(1 if dir == ExcavDir.edForward else -1)
         self.Round = [start, end]
 
+    def setcoord(self ,x ,y ,z):
+        self.x = x
+        self.y = y
+        self.z = z
+
     def setcurrent(self):
         self.Current = True
 
     def excav(self):
         self.Excavated = True
         self.Current = False
+
+    def getclass(self):
+        self.RockClass = GeoModel.getclass(self.x, self.y, self.z)
 
 
 class ExcavFaces:
@@ -200,7 +212,6 @@ class ExcavFaces:
                 self.Excavated.remove(exc[i+1])
                 self.Excavated.append([exc[i][0], exc[i+1][1]])
 
-
     def print(self):
         for face in self.Faces:
             print(face.Location, face.Direction, face.Advance, face.Round)
@@ -222,10 +233,24 @@ class Tunnel:
         self.EndExcavFace = ExcavFace()
         self.ExcavFaces = ExcavFaces([])
         self.Completed = False
+        self.Progress = 0 # in percent
         self.Height = -1
         self.Width = -1
         self.Area = -1
         self.Perimeter = -1
+        self.CumProd = 0
+
+    def setheight(self,h):
+        self.Height = h
+
+    def setwidth(self,w):
+        self.Width = w
+
+    def setarea(self,a):
+        self.Area = a
+
+    def setperi(self,p):
+        self.Perimeter = p
 
     def setwp(self,sp,ep):
         self.StartPoint = sp
@@ -271,8 +296,9 @@ class Tunnel:
 
     def excav(self):
         faces = copy.copy(self.ExcavFaces.Faces)
+        prod = 0
         for face in faces:
-            if face.Current is True:
+            if face.Current == True:
                 nf = ExcavFace()
                 loc = face.Location + face.Direction*face.Advance
                 dir = face.Direction
@@ -284,9 +310,12 @@ class Tunnel:
 
                 self.ExcavFaces.append(nf)
                 face.Current = False
+                prod = prod + adv*self.Area
 
             else:
                 pass
+        self.CumProd = self.CumProd + prod
+        return prod
 
     def print(self):
         print ('Tunnel::print ',self.StartPoint,self.EndPoint)
