@@ -222,6 +222,10 @@ class Tunnel:
         self.EndExcavFace = ExcavFace()
         self.ExcavFaces = ExcavFaces([])
         self.Completed = False
+        self.Height = -1
+        self.Width = -1
+        self.Area = -1
+        self.Perimeter = -1
 
     def setwp(self,sp,ep):
         self.StartPoint = sp
