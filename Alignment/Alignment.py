@@ -3,7 +3,7 @@ import sys
 import os
 import string
 import re
-#import kivy
+# import kivy
 import time
 from GeoClass.GeoClass import GeoClass
 from GeoClass.GeoClass import GeoClassType
@@ -168,7 +168,7 @@ class ExcavFace:
         end = loc + adv*(1 if dir == ExcavDir.edForward else -1)
         self.Round = [start, end]
 
-    def setcoord(self ,x ,y ,z):
+    def setcoord(self, x, y, z):
         self.x = x
         self.y = y
         self.z = z
@@ -185,7 +185,7 @@ class ExcavFace:
 
 
 class ExcavFaces:
-    def __init__(self,faces: [ExcavFace]):
+    def __init__(self, faces: [ExcavFace]):
         self.Faces = []
         self.Excavated = []
 
@@ -225,7 +225,7 @@ class ExcavFaces:
 
 
 class Tunnel:
-    def __init__(self,wp): # sp and ep are not points but index to the points
+    def __init__(self, wp): # sp and ep are not points but index to the points
         self.WorkingPoints = wp
         self.StartPoint = -1
         self.EndPoint = -1
