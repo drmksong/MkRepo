@@ -1,5 +1,9 @@
-from Point.Point import Point, Points, WorkingPoints
+import sys
+sys.path.append("..")
 
+from Point.Point import Point as PT
+from Point.Point import Points as PTS
+from Point.Point import WorkingPoints as WPS
 
 class Tunnel:
     def __init__(self,wp): # sp and ep are not points but index to the points
@@ -130,7 +134,19 @@ class Tunnels:
         self.Tunnels[key] = value
 
 def test():
-    pass
+
+    pnt1 = PT(0,0,0)
+    pnt2 = PT(1,0,0)
+    pnt3 = PT(2,0,0)
+
+    pnts = PTS([pnt1,pnt2,pnt3])
+    wps = WPS(pnts)
+    tun1 = Tunnel(wps)
+    tun2 = Tunnel(wps)
+
+    tun1.setwp(0,1)
+    tun2.setwp(1,2)
+    tuns = Tunnels([tun1, tun2])
 
 if __name__ == "__main__":
     test()
