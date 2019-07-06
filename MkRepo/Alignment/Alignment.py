@@ -1,3 +1,6 @@
+import sys
+sys.path.append("..")
+
 import math
 import sys
 import os
@@ -12,11 +15,18 @@ import copy
 from colorama import Fore
 from colorama import Style
 
-from GeoClass.GeoClass import GeoClass
-from GeoClass.GeoClass import GeoClassType
-from GeoModel.GeoModel import GeoModel
-from CycleTime.CycleTime import Cycles
-
+#from GeoClass.GeoClass import GeoClass
+#from GeoClass.GeoClass import GeoClassType
+#from GeoModel.GeoModel import GeoModel
+#from CycleTime.CycleTime import Cycles
+from Point.Point import Point
+from Point.Point import Points
+from Point.Point import WorkingPoints
+from ExcavFace.ExcavFace import ExcavDir
+from ExcavFace.ExcavFace import ExcavFace
+from ExcavFace.ExcavFace import ExcavFaces
+from Tunnel.Tunnel import Tunnel
+from Tunnel.Tunnel import Tunnels
 
 class Alignment:
     def __init__(self):
@@ -146,7 +156,11 @@ def test():
     pnt = t1.station(1)
 
     align = Alignment()
-    align.load("Alignment/1.txt")
+
+    if __name__ == "__main__":
+        align.load("1.txt")
+    else:
+        align.load("Alignment/1.txt")
 
     assert wp.size() == 4
     assert d == 1

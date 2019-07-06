@@ -71,9 +71,6 @@ def test():
 
     pnts = Points(ps)
 
-    #pnts.append(p1)
-    #pnts.append(p2)
-    #pnts.append(p3)
     d = p1.calc_dist(p2)
     print(d)
     pnts.print()
@@ -81,9 +78,10 @@ def test():
     wp = WorkingPoints(pnts)
     wp.setpoints(pnts)
 
-    #wp.append(p4)
     wp.print()
     wp[0].print()
+    assert wp[0].X == 0
+    print('pass')
 
 
 if __name__ == "__main__":

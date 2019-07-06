@@ -1,9 +1,12 @@
 import sys
 sys.path.append("..")
 
+import copy
 from Point.Point import Point as PT
 from Point.Point import Points as PTS
 from Point.Point import WorkingPoints as WPS
+from ExcavFace.ExcavFace import ExcavFace
+from ExcavFace.ExcavFace import ExcavFaces
 
 class Tunnel:
     def __init__(self,wp): # sp and ep are not points but index to the points
@@ -58,7 +61,7 @@ class Tunnel:
         if t > 1.0:
             print("t is greater than 1.0")
 
-        pnt = Point(0,0,0)
+        pnt = PT(0,0,0)
         pnt.X = sp.X + A * t
         pnt.Y = sp.Y + B * t
         pnt.Z = sp.Z + C * t
@@ -147,6 +150,7 @@ def test():
     tun1.setwp(0,1)
     tun2.setwp(1,2)
     tuns = Tunnels([tun1, tun2])
+    print('pass')
 
 if __name__ == "__main__":
     test()

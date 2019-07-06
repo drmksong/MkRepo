@@ -1,4 +1,11 @@
+import sys
+sys.path.append("..")
 
+import enum
+import copy
+from datetime import date as dt
+from GeoClass.GeoClass import GeoClassType
+from GeoClass.GeoClass import GeoClass
 
 
 class ExcavDir(enum.Enum):
@@ -84,3 +91,16 @@ class ExcavFaces:
 
     def __setitem__(self, key, value):
         self.Faces[key] = value
+
+
+
+def test():
+    face1 = ExcavFace()
+    face2 = ExcavFace()
+    face1.set(1,ExcavDir.edForward,1,dt.today())
+    face1.set(1,ExcavDir.edForward,1,dt.today())
+    faces = ExcavFaces([face1,face2])
+
+
+if __name__ == "__main__":
+    test()
