@@ -3,4 +3,8 @@ from Alignment import Alignment
 msg = "welcome to my world, MK"
 print(msg)
 
-Alignment.test()
+msg = "Hurry up...No time to lose!!!"
+print(msg)
+
+
+#Alignment.test()
