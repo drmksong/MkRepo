@@ -1,1 +1,6 @@
 .idea/*.*
+Alignment/__pycache__/*.*
+ExcavFace/__pycache__/*.*
+GeoClass/__pycache__/*.*
+Point/__pycache__/*.*
+Tunnel/__pycache__/*.*

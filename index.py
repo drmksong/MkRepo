@@ -1,6 +1,6 @@
 from Alignment import Alignment
 
-msg = "welcome"
+msg = "welcome to my world"
 print(msg)
 
 Alignment.test()
