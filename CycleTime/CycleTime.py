@@ -62,7 +62,7 @@ class DrillingCycleTime(BaseCycleTime):
 
     def CalcCycleTime(self):
         self.DrillMoveIn = 10+0.1*self.Input.TunnelCrossSection
-        self.MoveAlign4Next =
+        self.MoveAlign4Next = 1
 
 
 def test():
