@@ -75,34 +75,51 @@ class CycleInput:
 
 
 class BaseCycleTime:
-    def __init__(self):
-        self.Input = CycleInput()
+    def __init__(self,cycinput : CycleInput):
+        self.Input = cycinput
 
 class DrillingCycleTime(BaseCycleTime):
-    def __init__(self):
+    def __init__(self, cycinput : CycleInput):
+        self.Input = cycinput
         self.NoBoom = 3
-        self.DrillMoveInTime = = 10+0.1*self.Input.TunnelCrossSection
-        self.MoveAlign4Next = self.Input._NoTotalHoles*self.NoBoom*(0.55+0.04*(1+self.Input.BlastOverDrill))  # min
-        self.DrillBurnCutHole = 0
-        self.ChangeBit = 0
-        self.LostTime = 0
-        self.TotalCycleTime = 0
-
-
-    def CalcCycleTime(self):
+        self._DrillLength = self.Input.RoundLength*(1+self.Input.BlastOverDrill/100.0)
         self.DrillMoveInTime = 10+0.1*self.Input.TunnelCrossSection
-        self.MoveAlign4Next = self.Input._NoTotalHoles*(0.55+0.04*(1+self.Input.BlastOverDrill))/self.NoBoom  # min
-        self.DrillBurnCutHole = self.Input._NoBurnHoles
+        self.MoveAlign4Next = self.Input._NoTotalHoles*(0.55+0.04*(self._DrillLength)) / self.NoBoom  # min
+        self.DrillBurnCutHole = self.Input._NoBurnHoles*self._DrillLength*(0.0143*self.Input.DRI+0.8143)*48/102*1.25/self.NoBoom
+        self.DrillBlastHole = self.Input._NoChargedHoles*self._DrillLength / 1.39 /self.NoBoom # TODO : replace 1.39 with function, drilling speed
+        self.ChangeBit = 1.5 * (self.Input._NoTotalHoles*self._DrillLength) * 0.02 /self.NoBoom #TODO : replace 0.02 with function, change frequency per drill meter
+        drilltotlen = self._DrillLength*self.Input._NoTotalHoles
+        self.LostTime = ((1.4*math.pow(self.Input.TunnelCrossSection, -0.84)+0.92*math.pow(self.Input.TunnelCrossSection,-0.61))/2.0)*(self.MoveAlign4Next+self.DrillBurnCutHole+self.DrillBlastHole)
+        self.TotalCycleTime = self.DrillMoveInTime+self.MoveAlign4Next+self.DrillBurnCutHole+self.DrillBlastHole+self.ChangeBit+self.LostTime
 
 
+    def Refresh(self):
+        self._DrillLength = self.Input.RoundLength*(1+self.Input.BlastOverDrill/100.0)
+        self.DrillMoveInTime = 10+0.1*self.Input.TunnelCrossSection
+        self.MoveAlign4Next = self.Input._NoTotalHoles*(0.55+0.04*(1+self.Input.BlastOverDrill/100)) / self.NoBoom # min
+        self.DrillBurnCutHole = self.Input._NoBurnHoles*self._DrillLength*(0.0143*self.Input.DRI+0.8143)*48/102*1.25/self.NoBoom
+        self.DrillBlastHole = self.Input._NoChargedHoles*self._DrillLength* 1.39 /self.NoBoom # TODO : replace 1.39 with function, drilling speed
+        self.ChangeBit = 1.5 * (self.Input._NoTotalHoles*self._DrillLength) * 0.02 /self.NoBoom
+        drilltotlen = self._DrillLength*self.Input._NoTotalHoles
+        self.LostTime = (1.4*(math.pow(drilltotlen, -0.84)+0.92*math.pow(drilltotlen,-0.61))/2.0)*(self.MoveAlign4Next+self.DrillBurnCutHole+self.DrillBlastHole)
+        self.TotalCycleTime = self.DrillMoveInTime+self.MoveAlign4Next+self.DrillBurnCutHole+self.DrillBlastHole+self.ChangeBit+self.LostTime
 
 def test():
     cycinput = CycleInput()
     cycinput.UseCatridge = False
     cycinput.Refresh()
+    drillcyc = DrillingCycleTime(cycinput)
+
     print (cycinput._ExplosivePerRound)
     assert round(cycinput._ExplosivePerRound) == 357
     assert round(cycinput.LoaderProductionRate) == 159
+    print('move in: ',drillcyc.DrillMoveInTime)
+    print('move for next: ',drillcyc.MoveAlign4Next)
+    print('drill burncut: ',drillcyc.DrillBurnCutHole)
+    print('drill blasthole: ',drillcyc.DrillBlastHole)
+    print('change bit: ',drillcyc.ChangeBit)
+    print('lost time: ',drillcyc.LostTime)
+    print('tot: ',drillcyc.TotalCycleTime)
     print('pass')
 
 if __name__ == "__main__":
