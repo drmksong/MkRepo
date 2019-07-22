@@ -78,6 +78,9 @@ class BaseCycleTime:
     def __init__(self,cycinput : CycleInput):
         self.Input = cycinput
 
+    def Refresh(self):
+        self.Input.Refresh()
+
 class DrillingCycleTime(BaseCycleTime):
     def __init__(self, cycinput : CycleInput):
         self.Input = cycinput
@@ -92,8 +95,8 @@ class DrillingCycleTime(BaseCycleTime):
         self.LostTime = ((1.4*math.pow(self.Input.TunnelCrossSection, -0.84)+0.92*math.pow(self.Input.TunnelCrossSection,-0.61))/2.0)*(self.MoveAlign4Next+self.DrillBurnCutHole+self.DrillBlastHole)
         self.TotalCycleTime = self.DrillMoveInTime+self.MoveAlign4Next+self.DrillBurnCutHole+self.DrillBlastHole+self.ChangeBit+self.LostTime
 
-
     def Refresh(self):
+        self.Input.Refresh()
         self._DrillLength = self.Input.RoundLength*(1+self.Input.BlastOverDrill/100.0)
         self.DrillMoveInTime = 10+0.1*self.Input.TunnelCrossSection
         self.MoveAlign4Next = self.Input._NoTotalHoles*(0.55+0.04*(1+self.Input.BlastOverDrill/100)) / self.NoBoom # min
@@ -104,6 +107,29 @@ class DrillingCycleTime(BaseCycleTime):
         self.LostTime = (1.4*(math.pow(drilltotlen, -0.84)+0.92*math.pow(drilltotlen,-0.61))/2.0)*(self.MoveAlign4Next+self.DrillBurnCutHole+self.DrillBlastHole)
         self.TotalCycleTime = self.DrillMoveInTime+self.MoveAlign4Next+self.DrillBurnCutHole+self.DrillBlastHole+self.ChangeBit+self.LostTime
 
+class BlastingCycleTime(BaseCycleTime):
+    def __init__(self, cycinput : CycleInput):
+        self.Input = cycinput
+        self.NoCharger = 1
+        self._DrillLength = self.Input.RoundLength * (1 + self.Input.BlastOverDrill / 100.0)
+        self.ChargeHoleFixedTime = self.Input._NoTotalHoles*0.35/self.NoCharger
+        self.ChargeHoleLenDepTime = self.Input._NoTotalHoles*self._DrillLength *0.3/self.NoCharger
+        self.StemmingTime = self.Input._NoTotalHoles*0.215/self.NoCharger
+        self.WireUpTime = self.Input._NoTotalHoles*0.15/self.NoCharger+10
+        self.EvacuateTime = 5
+        self.TotalCycleTime = self.ChargeHoleFixedTime + self.ChargeHoleLenDepTime + self.StemmingTime + self.WireUpTime + self.EvacuateTime
+
+    def Refresh(self):
+        self.Input.Refresh()
+        self._DrillLength = self.Input.RoundLength * (1 + self.Input.BlastOverDrill / 100.0)
+        self.ChargeHoleFixedTime = self.Input._NoTotalHoles*0.35/self.NoCharger
+        self.ChargeHoleLenDepTime = self.Input._NoTotalHoles*self._DrillLength *0.3/self.NoCharger
+        self.StemmingTime = self.Input._NoTotalHoles*0.215/self.NoCharger
+        self.WireUpTime = self.Input._NoTotalHoles*0.15/self.NoCharger+10
+        self.EvacuateTime = 5
+        self.TotalCycleTime = self.ChargeHoleFixedTime + self.ChargeHoleLenDepTime + self.StemmingTime + self.WireUpTime + self.EvacuateTime
+
+class
 def test():
     cycinput = CycleInput()
     cycinput.UseCatridge = False
