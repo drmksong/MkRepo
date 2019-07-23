@@ -129,23 +129,40 @@ class BlastingCycleTime(BaseCycleTime):
         self.EvacuateTime = 5
         self.TotalCycleTime = self.ChargeHoleFixedTime + self.ChargeHoleLenDepTime + self.StemmingTime + self.WireUpTime + self.EvacuateTime
 
-class
+class VentCycleTime(BaseCycleTime):
+    def __init__(self, cycinput : CycleInput):
+        self.Input = cycinput
+        self.VentTime = 0.3338 * self.Input._NoTotalHoles
+
+    def Refresh(self):
+        self.VentTime = 0.3338 * self.Input._NoTotalHoles
+
+
 def test():
     cycinput = CycleInput()
     cycinput.UseCatridge = False
     cycinput.Refresh()
     drillcyc = DrillingCycleTime(cycinput)
+    blastcyc = BlastingCycleTime(cycinput)
 
     print (cycinput._ExplosivePerRound)
     assert round(cycinput._ExplosivePerRound) == 357
     assert round(cycinput.LoaderProductionRate) == 159
-    print('move in: ',drillcyc.DrillMoveInTime)
-    print('move for next: ',drillcyc.MoveAlign4Next)
-    print('drill burncut: ',drillcyc.DrillBurnCutHole)
-    print('drill blasthole: ',drillcyc.DrillBlastHole)
-    print('change bit: ',drillcyc.ChangeBit)
-    print('lost time: ',drillcyc.LostTime)
-    print('tot: ',drillcyc.TotalCycleTime)
+    #print('move in: ',drillcyc.DrillMoveInTime)
+    #print('move for next: ',drillcyc.MoveAlign4Next)
+    #print('drill burncut: ',drillcyc.DrillBurnCutHole)
+    #print('drill blasthole: ',drillcyc.DrillBlastHole)
+    #print('change bit: ',drillcyc.ChangeBit)
+    #print('lost time: ',drillcyc.LostTime)
+    #rint('tot: ',drillcyc.TotalCycleTime)
+
+    print('charge hole fixed time: ', blastcyc.ChargeHoleFixedTime)
+    print('charge hold dep time', blastcyc.ChargeHoleLenDepTime)
+    print('stem time', blastcyc.StemmingTime)
+    print('wire up time', blastcyc.WireUpTime)
+    print('tot time: ', blastcyc.TotalCycleTime)
+    print('')
+
     print('pass')
 
 if __name__ == "__main__":
