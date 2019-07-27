@@ -4,10 +4,12 @@ sys.path.append("..")
 import enum
 import math
 
+
 class BlastabilityIndex(enum.Enum):
     GoodBlastability = 0.38
     MediumBlastability = 0.47
     PoorBlastability = 0.56
+
 
 class CycleInput:
     def __init__(self):
@@ -55,7 +57,6 @@ class CycleInput:
         self._LoaderCycleTime = self.LoadnDumpTime + self.WaitTime  # min
         self.LoaderProductionRate = self._AvailablePayloadCapacity*(60/self._LoaderCycleTime)*self.NumberLoader
 
-
     def Refresh(self): # if Any of the Input changed, then this function should be called
         self._CenterHoleArea = 66*self.RoundLength-83 #mysterious
         self._NoBurnHoles = round(self._CenterHoleArea/82+0.5)
@@ -80,6 +81,7 @@ class BaseCycleTime:
 
     def Refresh(self):
         self.Input.Refresh()
+
 
 class DrillingCycleTime(BaseCycleTime):
     def __init__(self, cycinput : CycleInput):
@@ -107,6 +109,7 @@ class DrillingCycleTime(BaseCycleTime):
         self.LostTime = (1.4*(math.pow(drilltotlen, -0.84)+0.92*math.pow(drilltotlen,-0.61))/2.0)*(self.MoveAlign4Next+self.DrillBurnCutHole+self.DrillBlastHole)
         self.TotalCycleTime = self.DrillMoveInTime+self.MoveAlign4Next+self.DrillBurnCutHole+self.DrillBlastHole+self.ChangeBit+self.LostTime
 
+
 class BlastingCycleTime(BaseCycleTime):
     def __init__(self, cycinput : CycleInput):
         self.Input = cycinput
@@ -129,6 +132,7 @@ class BlastingCycleTime(BaseCycleTime):
         self.EvacuateTime = 5
         self.TotalCycleTime = self.ChargeHoleFixedTime + self.ChargeHoleLenDepTime + self.StemmingTime + self.WireUpTime + self.EvacuateTime
 
+
 class VentCycleTime(BaseCycleTime):
     def __init__(self, cycinput : CycleInput):
         self.Input = cycinput
@@ -138,12 +142,40 @@ class VentCycleTime(BaseCycleTime):
         self.VentTime = 0.3338 * self.Input._NoTotalHoles
 
 
+class ScalingCyCleTime(BaseCycleTime):
+    def __init__(self, cycinput : CycleInput):
+        self.Input = cycinput
+        self._DrillLength = self.Input.RoundLength * (1 + self.Input.BlastOverDrill / 100.0)
+        if self.Input.Blastability=="Good":
+            self.ScaleTime = 6 + 0.4 * self.Input.TunnelCrossSection
+        elif self.Input.Blastability=="Poor":
+            self.ScaleTime = 35 + 0.65 * self.Input.TunnelCrossSection
+        else:
+            self.ScaleTime = ((6 + 0.4 * self.Input.TunnelCrossSection) + (35 + 0.65 * self.Input.TunnelCrossSection))/2
+
+        self.ScaleTime = self.ScaleTime*(0.57+0.085*self._DrillLength)
+
+    def Refresh(self):
+        self.Input.Refresh()
+        self._DrillLength = self.Input.RoundLength * (1 + self.Input.BlastOverDrill / 100.0)
+        if self.Input.Blastability=="Good":
+            self.ScaleTime = 6 + 0.4 * self.Input.TunnelCrossSection
+        elif self.Input.Blastability=="Poor":
+            self.ScaleTime = 35 + 0.65 * self.Input.TunnelCrossSection
+        else:
+            self.ScaleTime = ((6 + 0.4 * self.Input.TunnelCrossSection) + (35 + 0.65 * self.Input.TunnelCrossSection))/2
+
+        self.ScaleTime = self.ScaleTime*(0.57+0.085*self._DrillLength)
+
+
 def test():
     cycinput = CycleInput()
     cycinput.UseCatridge = False
+    cycinput.Blastability = 'Medium'
     cycinput.Refresh()
     drillcyc = DrillingCycleTime(cycinput)
     blastcyc = BlastingCycleTime(cycinput)
+    scalecyc = ScalingCyCleTime(cycinput)
 
     print (cycinput._ExplosivePerRound)
     assert round(cycinput._ExplosivePerRound) == 357
@@ -161,6 +193,8 @@ def test():
     print('stem time', blastcyc.StemmingTime)
     print('wire up time', blastcyc.WireUpTime)
     print('tot time: ', blastcyc.TotalCycleTime)
+
+    print('scale time: ', scalecyc.ScaleTime)
     print('')
 
     print('pass')
