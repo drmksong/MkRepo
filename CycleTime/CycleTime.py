@@ -78,14 +78,16 @@ class CycleInput:
 class BaseCycleTime:
     def __init__(self,cycinput : CycleInput):
         self.Input = cycinput
+        self.TotalCycTime = 0
 
     def Refresh(self):
         self.Input.Refresh()
+        self.TotalCycTime = 0
 
 
 class DrillingCycleTime(BaseCycleTime):
     def __init__(self, cycinput : CycleInput):
-        self.Input = cycinput
+        super().__init__(cycinput)
         self.NoBoom = 3
         self._DrillLength = self.Input.RoundLength*(1+self.Input.BlastOverDrill/100.0)
         self.DrillMoveInTime = 10+0.1*self.Input.TunnelCrossSection
@@ -93,11 +95,11 @@ class DrillingCycleTime(BaseCycleTime):
         self.DrillBurnCutHole = self.Input._NoBurnHoles*self._DrillLength*(0.0143*self.Input.DRI+0.8143)*48/102*1.25/self.NoBoom
         self.DrillBlastHole = self.Input._NoChargedHoles*self._DrillLength / 1.39 /self.NoBoom # TODO : replace 1.39 with function, drilling speed
         self.ChangeBit = 1.5 * (self.Input._NoTotalHoles*self._DrillLength) * 0.02 /self.NoBoom #TODO : replace 0.02 with function, change frequency per drill meter
-        drilltotlen = self._DrillLength*self.Input._NoTotalHoles
         self.LostTime = ((1.4*math.pow(self.Input.TunnelCrossSection, -0.84)+0.92*math.pow(self.Input.TunnelCrossSection,-0.61))/2.0)*(self.MoveAlign4Next+self.DrillBurnCutHole+self.DrillBlastHole)
         self.TotalCycleTime = self.DrillMoveInTime+self.MoveAlign4Next+self.DrillBurnCutHole+self.DrillBlastHole+self.ChangeBit+self.LostTime
 
     def Refresh(self):
+        super().Refresh()
         self.Input.Refresh()
         self._DrillLength = self.Input.RoundLength*(1+self.Input.BlastOverDrill/100.0)
         self.DrillMoveInTime = 10+0.1*self.Input.TunnelCrossSection
@@ -112,7 +114,7 @@ class DrillingCycleTime(BaseCycleTime):
 
 class BlastingCycleTime(BaseCycleTime):
     def __init__(self, cycinput : CycleInput):
-        self.Input = cycinput
+        super().__init__(cycinput)
         self.NoCharger = 1
         self._DrillLength = self.Input.RoundLength * (1 + self.Input.BlastOverDrill / 100.0)
         self.ChargeHoleFixedTime = self.Input._NoTotalHoles*0.35/self.NoCharger
@@ -123,7 +125,7 @@ class BlastingCycleTime(BaseCycleTime):
         self.TotalCycleTime = self.ChargeHoleFixedTime + self.ChargeHoleLenDepTime + self.StemmingTime + self.WireUpTime + self.EvacuateTime
 
     def Refresh(self):
-        self.Input.Refresh()
+        super().Refresh()
         self._DrillLength = self.Input.RoundLength * (1 + self.Input.BlastOverDrill / 100.0)
         self.ChargeHoleFixedTime = self.Input._NoTotalHoles*0.35/self.NoCharger
         self.ChargeHoleLenDepTime = self.Input._NoTotalHoles*self._DrillLength *0.3/self.NoCharger
@@ -135,16 +137,19 @@ class BlastingCycleTime(BaseCycleTime):
 
 class VentCycleTime(BaseCycleTime):
     def __init__(self, cycinput : CycleInput):
-        self.Input = cycinput
+        super().__init__(cycinput)
         self.VentTime = 0.3338 * self.Input._NoTotalHoles
+        self.TotalCycTime = self.VentTime
 
     def Refresh(self):
+        super().Refresh()
         self.VentTime = 0.3338 * self.Input._NoTotalHoles
+        self.TotalCycTime = self.VentTime
 
 
 class ScalingCyCleTime(BaseCycleTime):
     def __init__(self, cycinput : CycleInput):
-        self.Input = cycinput
+        super().__init__(cycinput)
         self._DrillLength = self.Input.RoundLength * (1 + self.Input.BlastOverDrill / 100.0)
         if self.Input.Blastability=="Good":
             self.ScaleTime = 6 + 0.4 * self.Input.TunnelCrossSection
@@ -154,9 +159,10 @@ class ScalingCyCleTime(BaseCycleTime):
             self.ScaleTime = ((6 + 0.4 * self.Input.TunnelCrossSection) + (35 + 0.65 * self.Input.TunnelCrossSection))/2
 
         self.ScaleTime = self.ScaleTime*(0.57+0.085*self._DrillLength)
+        self.TotalCycTime = self.ScaleTime
 
     def Refresh(self):
-        self.Input.Refresh()
+        super().Refresh()
         self._DrillLength = self.Input.RoundLength * (1 + self.Input.BlastOverDrill / 100.0)
         if self.Input.Blastability=="Good":
             self.ScaleTime = 6 + 0.4 * self.Input.TunnelCrossSection
@@ -166,6 +172,72 @@ class ScalingCyCleTime(BaseCycleTime):
             self.ScaleTime = ((6 + 0.4 * self.Input.TunnelCrossSection) + (35 + 0.65 * self.Input.TunnelCrossSection))/2
 
         self.ScaleTime = self.ScaleTime*(0.57+0.085*self._DrillLength)
+        self.TotalCycTime = self.ScaleTime
+
+
+class MuckCycleTime(BaseCycleTime):
+    def __init__(self, cycinput:CycleInput):
+        super().__init__(cycinput)
+        self.MoveInSetup = 15  # input calibration needed
+        self.Mucking = 60*self.Input.TunnelCrossSection*(1+self.Input.AveOverBreak/100)*self.Input.RoundLength/self.Input.LoaderProductionRate
+        self.LossTime = 0.111*(self.MoveInSetup+self.Mucking)
+        self.TotalCycTime = self.MoveInSetup + self.Mucking + self.LossTime
+
+    def Refresh(self):
+        super().Refresh()
+        self.MoveInSetup = 15  # input calibration needed
+        self.Mucking = 60*self.Input.TunnelCrossSection*(1+self.Input.AveOverBreak/100)*self.Input.RoundLength/self.Input.LoaderProductionRate
+        self.LossTime = 0.111*(self.MoveInSetup+self.Mucking)
+        self.TotalCycTime = self.MoveInSetup + self.Mucking + self.LossTime
+
+
+class SurveyMappingCycleTime(BaseCycleTime):
+    def __init__(self, cycinput:CycleInput):
+        super().__init__(cycinput)
+        self.SurveyMapping = 25
+        self.TotalCycTime = self.SurveyMapping
+
+    def Refresh(self):
+        super().Refresh()
+        self.TotalCycTime = self.SurveyMapping
+
+
+class SupportCycleTime(BaseCycleTime):
+    def __init__(self, cycinput:CycleInput):
+        super().__init__(cycinput)
+        self.DrillMoveInSetup = 10
+        numholes = self.Input.BoltQuantity*self.Input.RoundLength
+        self.RBHoleBlow = 0.75 # min
+        self.RBInstallTeam = 2
+        self.RBDrillBoom = 2
+        self.RBLength = 4
+        self.RBInstallTimePerMeter = 1.74
+        self.RBDrillSpeed = (0.0143*self.Input.DRI+0.8143)  # meter
+
+        self.SCSpraySpeed = 7.64 # m3/hr
+
+        self.BlowAlign4Next =  numholes * self.RBHoleBlow / self.RBDrillBoom
+        self.DrillHoles = numholes * self.RBLength / self.RBDrillSpeed / self.RBDrillBoom
+        self.InstallRockbolts = numholes * self.RBLength * self.RBInstallTimePerMeter / self.RBInstallTeam
+
+        self.SetupSC = 10 # min pure input
+        self.SpraySC = self.Input.SCQuantity * self.Input.RoundLength *60 / self.SCSpraySpeed
+        self.CleanupSC = 10 # min pure input
+
+        self.TotalCycTime = self.BlowAlign4Next + self.DrillHoles + self.InstallRockbolts + self.SetupSC + self.SpraySC + self.CleanupSC
+
+    def Refresh(self):
+        super().Refresh()
+        numholes = self.Input.BoltQuantity*self.Input.RoundLength
+        self.RBDrillSpeed = (0.0143*self.Input.DRI+0.8143)  # meter
+
+        self.BlowAlign4Next =  numholes * self.RBHoleBlow / self.RBDrillBoom
+        self.DrillHoles = numholes * self.RBLength / self.RBDrillSpeed / self.RBDrillBoom
+        self.InstallRockbolts = numholes * self.RBLength * self.RBInstallTimePerMeter / self.RBInstallTeam
+
+        self.SpraySC = self.Input.SCQuantity * self.Input.RoundLength *60 / self.SCSpraySpeed
+
+        self.TotalCycTime = self.BlowAlign4Next + self.DrillHoles + self.InstallRockbolts + self.SetupSC + self.SpraySC + self.CleanupSC
 
 
 def test():
@@ -176,6 +248,8 @@ def test():
     drillcyc = DrillingCycleTime(cycinput)
     blastcyc = BlastingCycleTime(cycinput)
     scalecyc = ScalingCyCleTime(cycinput)
+    muckcyc = MuckCycleTime(cycinput)
+    sptcyc = SupportCycleTime(cycinput)
 
     print (cycinput._ExplosivePerRound)
     assert round(cycinput._ExplosivePerRound) == 357
@@ -196,6 +270,9 @@ def test():
 
     print('scale time: ', scalecyc.ScaleTime)
     print('')
+    print('loader production: ',muckcyc.Input.LoaderProductionRate)
+    print('muck time: ', muckcyc.TotalCycTime)
+    print('support time: ',sptcyc.TotalCycTime)
 
     print('pass')
 
